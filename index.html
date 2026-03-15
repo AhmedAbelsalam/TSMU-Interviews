@@ -11,7 +11,6 @@
     <meta property="og:image" content="photo1.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- مكتبة تأثير الاحتفال (Confetti) -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     
@@ -71,7 +70,7 @@
             border-color: #27272a;
         }
         
-        /* الحقول */
+        /* 🔴 الحل النهائي والجذري لمشكلة الآيفون (Safari) 🔴 */
         .input-field { 
             transition: all 0.3s ease;
             box-sizing: border-box !important;
@@ -79,6 +78,22 @@
             max-width: 100% !important;
             display: block !important;
         }
+        
+        /* إجبار حقل التاريخ على التجاوب في أجهزة آبل */
+        input[type="date"] {
+            -webkit-appearance: none !important; /* إلغاء تصميم آبل الافتراضي الذي يسبب المشكلة */
+            -moz-appearance: none !important;
+            appearance: none !important;
+            min-height: 50px; /* ضمان ارتفاع مناسب بعد إلغاء المظهر الافتراضي */
+        }
+        
+        /* ضبط محاذاة النص داخل حقل التاريخ للآيفون */
+        input[type="date"]::-webkit-date-and-time-value {
+            text-align: right;
+            margin: 0;
+            padding: 0;
+        }
+
         .input-field:focus {
             transform: translateY(-2px);
             box-shadow: 0 8px 15px -3px rgba(229, 9, 20, 0.1);
@@ -91,12 +106,10 @@
         }
         .option-btn:active { transform: scale(0.95); }
         
-        /* شريط التقدم */
         #progress-bar { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         
-        /* 🔴 أكواد اكتمال الاستمارة 100% 🔴 */
         .progress-100 {
-            background-color: #D4AF37 !important; /* ذهبي */
+            background-color: #D4AF37 !important;
             box-shadow: 0 0 15px #D4AF37, 0 0 5px #D4AF37 !important;
         }
         
@@ -113,7 +126,6 @@
             100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
         }
 
-        /* تصميم مخصص للقوائم المنسدلة */
         select.input-field {
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23C10710'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
@@ -199,11 +211,12 @@
                             <h3 class="text-xl sm:text-2xl font-black text-brandBlack dark:text-white">بيانات المقابلة الأساسية</h3>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 dark:bg-gray-800/40 p-4 sm:p-5 rounded-2xl border border-gray-100 dark:border-gray-800">
-                            <div class="min-w-0 w-full">
+                            <!-- التعديل الإضافي: وضع overflow-hidden للحاوية كطبقة حماية إضافية -->
+                            <div class="min-w-0 w-full overflow-hidden">
                                 <label class="block text-gray-800 dark:text-gray-300 font-bold mb-2 text-sm sm:text-base">مسؤول المقابلة <span class="text-brandRed-500">*</span></label>
                                 <input type="text" name="entry.110769190" required placeholder="اسمك الكامل" class="input-field req-input px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:border-brandRed-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-brandRed-900/30 text-gray-900 dark:text-white text-sm sm:text-base">
                             </div>
-                            <div class="min-w-0 w-full">
+                            <div class="min-w-0 w-full overflow-hidden">
                                 <label class="block text-gray-800 dark:text-gray-300 font-bold mb-2 text-sm sm:text-base">تاريخ اليوم <span class="text-brandRed-500">*</span></label>
                                 <input type="date" name="entry.1448701971" required class="input-field req-input px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:border-brandRed-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-brandRed-900/30 text-gray-900 dark:text-white text-sm sm:text-base">
                             </div>
@@ -218,13 +231,13 @@
                         </div>
                         
                         <div class="space-y-4 bg-gray-50 dark:bg-gray-800/40 p-4 sm:p-5 rounded-2xl border border-gray-100 dark:border-gray-800">
-                            <div class="min-w-0 w-full">
+                            <div class="min-w-0 w-full overflow-hidden">
                                 <label class="block text-gray-800 dark:text-gray-300 font-bold mb-2 text-sm sm:text-base">الاسم كامل (كما في البطاقة) <span class="text-brandRed-500">*</span></label>
                                 <input type="text" name="entry.39794929" required placeholder="الاسم الرباعي" class="input-field req-input px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:border-brandRed-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-brandRed-900/30 text-sm sm:text-base dark:text-white">
                             </div>
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="min-w-0 w-full">
+                                <div class="min-w-0 w-full overflow-hidden">
                                     <label class="block text-gray-800 dark:text-gray-300 font-bold mb-2 text-sm sm:text-base">المحافظة <span class="text-brandRed-500">*</span></label>
                                     <select name="entry.1330297754" required class="input-field req-input px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:border-brandRed-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-brandRed-900/30 cursor-pointer text-sm sm:text-base dark:text-white">
                                         <option value="" disabled selected>اختر المحافظة...</option>
@@ -239,7 +252,7 @@
                                         <option value="قنا">قنا</option><option value="شمال سيناء">شمال سيناء</option><option value="سوهاج">سوهاج</option>
                                     </select>
                                 </div>
-                                <div class="min-w-0 w-full">
+                                <div class="min-w-0 w-full overflow-hidden">
                                     <label class="block text-gray-800 dark:text-gray-300 font-bold mb-2 text-sm sm:text-base">رقم الهاتف <span class="text-brandRed-500">*</span></label>
                                     <input type="tel" name="entry.445579757" required dir="ltr" placeholder="01X XXXX XXXX" class="input-field req-input text-right px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:border-brandRed-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-brandRed-900/30 text-sm sm:text-base dark:text-white">
                                 </div>
@@ -247,7 +260,7 @@
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-red-50/50 dark:bg-red-900/10 p-4 sm:p-5 rounded-2xl border border-red-100 dark:border-red-900/30 mt-4 transition-colors">
-                            <div class="min-w-0 w-full">
+                            <div class="min-w-0 w-full overflow-hidden">
                                 <label class="block text-brandBlack dark:text-gray-200 font-bold mb-2 text-sm sm:text-base">اللجنة المراد الانضمام إليها <span class="text-brandRed-500">*</span></label>
                                 <select name="entry.602646401" required class="input-field req-input px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:border-brandRed-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-brandRed-900/30 cursor-pointer shadow-sm text-sm sm:text-base dark:text-white">
                                     <option value="" disabled selected>تحديد اللجنة...</option>
@@ -263,7 +276,7 @@
                                     <option value="المكتب الإعلامي">المكتب الإعلامي</option>
                                 </select>
                             </div>
-                            <div class="min-w-0 w-full">
+                            <div class="min-w-0 w-full overflow-hidden">
                                 <label class="block text-brandBlack dark:text-gray-200 font-bold mb-2 text-sm sm:text-base">طريقة الحضور <span class="text-brandRed-500">*</span></label>
                                 <div class="flex gap-2">
                                     <label class="flex-1 cursor-pointer">
@@ -294,7 +307,7 @@
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white dark:bg-gray-800/40 p-4 sm:p-5 rounded-2xl border border-gray-100 dark:border-gray-800 transition-colors">
                             
-                            <div class="min-w-0 w-full">
+                            <div class="min-w-0 w-full overflow-hidden">
                                 <label class="block text-sm sm:text-base font-bold text-gray-800 dark:text-gray-300 mb-2">المظهر <span class="text-brandRed-500">*</span></label>
                                 <select name="entry.699681147" required class="input-field req-input px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/30 cursor-pointer text-sm sm:text-base dark:text-white font-semibold">
                                     <option value="" disabled selected>اختر التقييم...</option>
@@ -306,7 +319,7 @@
                                 </select>
                             </div>
 
-                            <div class="min-w-0 w-full">
+                            <div class="min-w-0 w-full overflow-hidden">
                                 <label class="block text-sm sm:text-base font-bold text-gray-800 dark:text-gray-300 mb-2">اللباقة وطريقة التحدث <span class="text-brandRed-500">*</span></label>
                                 <select name="entry.393000788" required class="input-field req-input px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/30 cursor-pointer text-sm sm:text-base dark:text-white font-semibold">
                                     <option value="" disabled selected>اختر التقييم...</option>
@@ -318,7 +331,7 @@
                                 </select>
                             </div>
 
-                            <div class="min-w-0 w-full">
+                            <div class="min-w-0 w-full overflow-hidden">
                                 <label class="block text-sm sm:text-base font-bold text-gray-800 dark:text-gray-300 mb-2">المعرفة بمهام اللجنة <span class="text-brandRed-500">*</span></label>
                                 <select name="entry.2112193422" required class="input-field req-input px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/30 cursor-pointer text-sm sm:text-base dark:text-white font-semibold">
                                     <option value="" disabled selected>اختر التقييم...</option>
@@ -330,7 +343,7 @@
                                 </select>
                             </div>
 
-                            <div class="min-w-0 w-full">
+                            <div class="min-w-0 w-full overflow-hidden">
                                 <label class="block text-sm sm:text-base font-bold text-gray-800 dark:text-gray-300 mb-2">المعرفة بالاتحاد <span class="text-brandRed-500">*</span></label>
                                 <select name="entry.43704687" required class="input-field req-input px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/30 cursor-pointer text-sm sm:text-base dark:text-white font-semibold">
                                     <option value="" disabled selected>اختر التقييم...</option>
@@ -342,7 +355,7 @@
                                 </select>
                             </div>
 
-                            <div class="md:col-span-2 min-w-0 w-full">
+                            <div class="md:col-span-2 min-w-0 w-full overflow-hidden">
                                 <label class="block text-sm sm:text-base font-bold text-gray-800 dark:text-gray-300 mb-2">الثقافة العامة <span class="text-brandRed-500">*</span></label>
                                 <select name="entry.563600896" required class="input-field req-input px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/30 cursor-pointer text-sm sm:text-base dark:text-white font-semibold">
                                     <option value="" disabled selected>اختر التقييم...</option>
@@ -360,7 +373,7 @@
                                 
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <!-- Excel -->
-                                    <div class="bg-gray-50 dark:bg-gray-900 p-3 rounded-xl border border-gray-200 dark:border-gray-700 min-w-0 w-full">
+                                    <div class="bg-gray-50 dark:bg-gray-900 p-3 rounded-xl border border-gray-200 dark:border-gray-700 min-w-0 w-full overflow-hidden">
                                         <div class="flex items-center gap-2 mb-2">
                                             <svg class="w-5 h-5 text-green-600" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1.4 14.5l-1.6-2.4-1.6 2.4H7.6l2.4-3.5-2.4-3.5h1.8l1.6 2.4 1.6-2.4h1.8l-2.4 3.5 2.4 3.5h-1.8z"/></svg>
                                             <span class="font-bold text-sm text-gray-800 dark:text-gray-200">Excel <span class="text-brandRed-500">*</span></span>
@@ -372,7 +385,7 @@
                                     </div>
 
                                     <!-- Word -->
-                                    <div class="bg-gray-50 dark:bg-gray-900 p-3 rounded-xl border border-gray-200 dark:border-gray-700 min-w-0 w-full">
+                                    <div class="bg-gray-50 dark:bg-gray-900 p-3 rounded-xl border border-gray-200 dark:border-gray-700 min-w-0 w-full overflow-hidden">
                                         <div class="flex items-center gap-2 mb-2">
                                             <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm1.1 14.5h-1.7l-1.2-3.8-1.2 3.8H9.3l-1.8-5h1.7l1 3.5 1.1-3.5h1.4l1.1 3.5 1 3.5h1.7l-1.8 5z"/></svg>
                                             <span class="font-bold text-sm text-gray-800 dark:text-gray-200">Word <span class="text-brandRed-500">*</span></span>
@@ -384,7 +397,7 @@
                                     </div>
 
                                     <!-- PowerPoint -->
-                                    <div class="bg-gray-50 dark:bg-gray-900 p-3 rounded-xl border border-gray-200 dark:border-gray-700 min-w-0 w-full">
+                                    <div class="bg-gray-50 dark:bg-gray-900 p-3 rounded-xl border border-gray-200 dark:border-gray-700 min-w-0 w-full overflow-hidden">
                                         <div class="flex items-center gap-2 mb-2">
                                             <svg class="w-5 h-5 text-orange-500" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1.5 8.5H10v5.5H8.5v-8h4c1.1 0 2 .9 2 2s-.9 2-2 2zm-1-1.5v1.5h1c.4 0 .8-.3.8-.8s-.4-.8-.8-.8h-1z"/></svg>
                                             <span class="font-bold text-sm text-gray-800 dark:text-gray-200">PowerPoint <span class="text-brandRed-500">*</span></span>
@@ -406,25 +419,25 @@
                             <h3 class="text-xl sm:text-2xl font-black text-brandBlack dark:text-white">المهارات والخبرات</h3>
                         </div>
                         <div class="space-y-4 bg-gray-50 dark:bg-gray-800/40 p-4 sm:p-5 rounded-2xl border border-gray-100 dark:border-gray-800 transition-colors">
-                            <div class="min-w-0 w-full">
+                            <div class="min-w-0 w-full overflow-hidden">
                                 <label class="block text-gray-800 dark:text-gray-300 font-bold mb-2 text-sm sm:text-base">المهارات العامة <span class="text-brandRed-500">*</span></label>
                                 <textarea name="entry.463780534" rows="2" required placeholder="اذكر المهارات التي تتقنها..." class="input-field req-input px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:border-brandRed-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-brandRed-900/30 resize-none text-sm sm:text-base dark:text-white"></textarea>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="min-w-0 w-full">
+                                <div class="min-w-0 w-full overflow-hidden">
                                     <label class="block text-gray-800 dark:text-gray-300 font-bold mb-2 text-sm sm:text-base">اللغات <span class="text-brandRed-500">*</span></label>
                                     <input type="text" name="entry.575480984" required placeholder="مثال: الإنجليزية (جيد جداً)" class="input-field req-input px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:border-brandRed-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-brandRed-900/30 text-sm sm:text-base dark:text-white">
                                 </div>
-                                <div class="min-w-0 w-full">
+                                <div class="min-w-0 w-full overflow-hidden">
                                     <label class="block text-gray-800 dark:text-gray-300 font-bold mb-2 text-sm sm:text-base">الهوايات <span class="text-brandRed-500">*</span></label>
                                     <input type="text" name="entry.32870955" required placeholder="مثال: القراءة، التصميم..." class="input-field req-input px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:border-brandRed-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-brandRed-900/30 text-sm sm:text-base dark:text-white">
                                 </div>
                             </div>
-                            <div class="min-w-0 w-full">
+                            <div class="min-w-0 w-full overflow-hidden">
                                 <label class="block text-gray-800 dark:text-gray-300 font-bold mb-2 text-sm sm:text-base">الخبرات (حالية / سابقة) <span class="text-brandRed-500">*</span></label>
                                 <textarea name="entry.791498292" rows="2" required placeholder="هل لديك تجارب سابقة؟ اذكرها هنا..." class="input-field req-input px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:border-brandRed-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-brandRed-900/30 resize-none text-sm sm:text-base dark:text-white"></textarea>
                             </div>
-                            <div class="min-w-0 w-full">
+                            <div class="min-w-0 w-full overflow-hidden">
                                 <label class="block text-gray-800 dark:text-gray-300 font-bold mb-2 text-sm sm:text-base">الهدف من الانضمام للاتحاد <span class="text-brandRed-500">*</span></label>
                                 <input type="text" name="entry.454249135" required placeholder="ما هو دافعك الأساسي للانضمام؟" class="input-field req-input px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:border-brandRed-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-brandRed-900/30 text-sm sm:text-base dark:text-white">
                             </div>
@@ -436,7 +449,7 @@
                         <div class="relative z-10">
                             <h3 class="text-xl sm:text-2xl font-black text-brandBlack dark:text-gold-500 mb-4 border-b border-gray-200 dark:border-gray-800 pb-3">القرار النهائي</h3>
                             
-                            <div class="mb-5 min-w-0 w-full">
+                            <div class="mb-5 min-w-0 w-full overflow-hidden">
                                 <label class="block text-gray-800 dark:text-gray-300 font-bold mb-2 text-sm sm:text-base">ملاحظات مسوؤل المقابلة (تطوع في مكان آخر) <span class="text-brandRed-500">*</span></label>
                                 <textarea name="entry.1200011215" rows="3" required placeholder="اكتب رأيك النهائي وملاحظاتك هنا..." class="input-field req-input px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/30 placeholder-gray-400 dark:placeholder-gray-600 resize-none text-sm sm:text-base"></textarea>
                             </div>
@@ -520,7 +533,7 @@
             }
         }
 
-        let isCompleted = false; // متغير لمنع تشغيل تأثير الاحتفال أكثر من مرة
+        let isCompleted = false;
 
         function updateProgress() {
             const form = document.getElementById('main-form');
@@ -548,26 +561,19 @@
 
             const percentage = totalQuestions === 0 ? 0 : Math.round((answeredQuestions / totalQuestions) * 100);
             
-            // 1. تحديث شريط التقدم
             const progressBar = document.getElementById('progress-bar');
             progressBar.style.width = percentage + '%';
 
-            // 2. تفعيل التغييرات عند وصول النسبة 100%
             const submitBtn = document.getElementById('submit-btn');
             const submitText = document.getElementById('submit-btn-text');
 
             if (percentage === 100) {
-                // تحويل الشريط للون الذهبي
                 progressBar.classList.add('progress-100');
-                // جعل الزر ينبض باللون الذهبي
                 submitBtn.classList.add('btn-ready');
-                // تغيير نص الزر
                 submitText.innerHTML = '✨ الاستمارة مكتملة.. أرسل الآن ✨ <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
 
-                // تشغيل تأثير الاحتفال مرة واحدة فقط
                 if (!isCompleted) {
                     isCompleted = true;
-                    // اطلاق قصاصات ورق الاحتفال
                     confetti({
                         particleCount: 150,
                         spread: 80,
@@ -577,7 +583,6 @@
                     });
                 }
             } else {
-                // إزالة التأثيرات إذا قام المستخدم بمسح أحد الحقول بعد إكمالها
                 progressBar.classList.remove('progress-100');
                 submitBtn.classList.remove('btn-ready');
                 submitText.innerHTML = 'حفظ التقييم وإرسال <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>';
