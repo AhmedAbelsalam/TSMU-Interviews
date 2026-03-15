@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>استمارة المقابلة الشخصية | اتحاد طلاب تحيا مصر</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        // إعدادات الوضع الليلي وألوان الهوية البصرية
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gold: { 400: '#FBBF24', 500: '#D4AF37', 600: '#B4942A' },
+                        brandRed: { 500: '#E50914', 600: '#C10710', 700: '#99050b' },
+                        brandBlack: '#0a0a0a'
+                    }
+                }
+            }
+        }
+
+        // تفعيل الوضع الليلي بناءً على تفضيلات المستخدم السابقة
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        var submitted = false;
+    </script>
+    <style>
+        /* إجبار المتصفح على منع التمرير الأفقي */
+        html, body { 
+            overflow-x: hidden; 
+            width: 100%;
+            font-family: 'Cairo', sans-serif; 
+        }
+        
+        /* ضبط الخلفية المنقطة لتكون أكثر وضوحاً وتغطي الشاشة بالكامل */
+        body {
+            background-color: #f8f9fa; 
+            background-image: radial-gradient(#d1d5db 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            transition: background-color 0.3s, color 0.3s;
+            padding-bottom: 80px;
+        }
+
+        .dark body {
+            background-color: #080808;
+            background-image: radial-gradient(#27272a 1.5px, transparent 1.5px);
+        }
+        
+        /* شريط تمرير أنيق */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #E50914; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #C10710; }
+        
+        /* البطاقات الزجاجية */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        .dark .glass-card {
+            background: rgba(17, 24, 39, 0.95);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            border-color: #374151;
+        }
+        
+        /* الحقول */
+        .input-field { transition: all 0.3s ease; }
+        .input-field:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(229, 9, 20, 0.1);
+        }
+        
+        /* أزرار التقييم */
+        .option-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .option-btn:active { transform: scale(0.95); }
+
+        /* شريط التقدم */
+        #progress-bar { transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+    </style>
+</head>
+<body class="antialiased text-gray-800 dark:text-gray-200 selection:bg-red-200 selection:text-red-900 dark:selection:bg-red-900 dark:selection:text-white">
+
+    <!-- شريط التقدم العلوي -->
+    <div class="fixed top-0 left-0 w-full h-1.5 bg-gray-200 dark:bg-gray-800 z-[60]">
+        <div id="progress-bar" class="h-full bg-brandRed-600 rounded-r-full shadow-[0_0_10px_#E50914]" style="width: 0%;"></div>
+    </div>
+
+    <!-- زر الوضع الليلي العائم (FAB) -->
+    <button onclick="toggleTheme()" class="fixed bottom-6 left-6 z-[100] p-3 sm:p-4 rounded-full bg-white dark:bg-[#111] text-gray-800 dark:text-gold-400 shadow-[0_5px_15px_rgba(0,0,0,0.15)] dark:shadow-[0_5px_15px_rgba(0,0,0,0.5)] border border-gray-200 dark:border-gray-800 hover:scale-110 active:scale-95 transition-all duration-300 focus:outline-none">
+        <svg class="w-6 h-6 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        <svg class="w-6 h-6 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+    </button>
+
+    <!-- الهيدر الشفاف المدمج بالكامل مع الخلفية المنقطة -->
+    <header class="relative pt-10 pb-28 sm:pt-14 sm:pb-36 px-4 transition-colors duration-300">
+        <!-- إضاءة خفيفة للوجوهات في الوضع الليلي فقط -->
+        <div class="absolute inset-0 overflow-hidden z-0 pointer-events-none opacity-0 dark:opacity-100 transition-opacity duration-300">
+            <div class="absolute top-10 left-1/2 -translate-x-1/2 w-full max-w-2xl h-48 bg-brandRed-600/10 blur-[80px]"></div>
+        </div>
+        
+        <div class="relative z-10 max-w-3xl mx-auto flex flex-col items-center">
+            <div class="flex justify-center items-center gap-6 sm:gap-12 w-full mb-6 sm:mb-8">
+                <!-- اللوجو الأول دائري -->
+                <div class="bg-white p-3 sm:p-4 rounded-full shadow-md border border-gray-100 w-28 h-28 sm:w-36 sm:h-36 flex items-center justify-center transform hover:scale-105 transition duration-300 overflow-hidden">
+                    <img src="photo1.png" alt="وزارة الشباب والرياضة" class="max-w-full max-h-full object-contain" onerror="this.outerHTML='<div class=\'text-xs font-bold text-gray-400 text-center\'>شعار 1</div>'">
+                </div>
+                <!-- اللوجو الثاني دائري -->
+                <div class="bg-white p-3 sm:p-4 rounded-full shadow-md border border-gray-100 w-28 h-28 sm:w-36 sm:h-36 flex items-center justify-center transform hover:scale-105 transition duration-300 overflow-hidden">
+                    <img src="photo2.png" alt="اتحاد طلاب تحيا مصر" class="max-w-full max-h-full object-contain" onerror="this.outerHTML='<div class=\'text-xs font-bold text-gray-400 text-center\'>شعار 2</div>'">
+                </div>
+            </div>
+
+            <!-- بطاقة العنوان العائمة -->
+            <div class="bg-white/80 dark:bg-[#111111]/90 backdrop-blur-md border border-gray-200/50 dark:border-[#222] p-5 sm:p-8 rounded-3xl text-center shadow-xl w-full max-w-xl transition-colors duration-300">
+                <span class="inline-block bg-gold-500 text-brandBlack font-extrabold text-[10px] sm:text-xs tracking-wider px-4 py-1 rounded-full mb-3 shadow-sm">موسم 2026</span>
+                <h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-brandBlack dark:text-white mb-2 tracking-tight transition-colors">
+                    اتحاد طلاب <span class="text-brandRed-600">تحيا مصر</span>
+                </h1>
+                <h2 class="text-lg sm:text-xl text-gray-600 dark:text-gray-400 font-bold mt-1 transition-colors">استمارة تقييم المقابلات</h2>
+            </div>
+        </div>
+    </header>
+
+    <main id="form-section" class="w-full max-w-4xl mx-auto px-3 sm:px-6 lg:px-8 relative z-20 -mt-20 sm:-mt-28">
+        <div class="glass-card p-4 sm:p-8 rounded-3xl border border-gray-200 dark:border-gray-800">
+            
+            <!-- رسالة النجاح -->
+            <div id="success-message" class="hidden text-center py-12 sm:py-16 animate-fade-in">
+                <div class="mx-auto flex items-center justify-center h-20 w-20 sm:h-24 sm:w-24 rounded-full bg-gradient-to-tr from-green-500 to-emerald-400 mb-6 shadow-lg transform hover:scale-105 transition duration-300">
+                    <svg class="h-10 w-10 sm:h-12 sm:w-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-black text-brandBlack dark:text-white mb-3">تم التقييم بنجاح!</h2>
+                <p class="text-base sm:text-lg text-gray-500 dark:text-gray-400 mb-8">تم حفظ البيانات وإرسالها إلى قاعدة البيانات بأمان.</p>
+                <button onclick="window.location.reload();" class="bg-brandRed-600 text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-bold text-base sm:text-lg hover:bg-brandRed-700 transition-all duration-300 shadow-md flex items-center justify-center gap-2 mx-auto w-full sm:w-auto">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    <span>تسجيل مقابلة جديدة</span>
+                </button>
+            </div>
+
+            <!-- النموذج -->
+            <div id="custom-form-container">
+                <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) { document.getElementById('custom-form-container').style.display='none'; document.getElementById('success-message').style.display='block'; window.scrollTo({top: document.getElementById('form-section').offsetTop - 50, behavior: 'smooth'}); }"></iframe>
+                
+                <form id="main-form" action="https://docs.google.com/forms/d/e/1FAIpQLSfR6EVq46d7mNiSicYhi0KP-WJFto9XUiv0OfvCB8b5Wegk4Q/formResponse?usp=header" method="POST" target="hidden_iframe" onsubmit="submitted=true;">
+                    
+                    <!-- ================= القسم 1: بيانات المقابلة ================= -->
+                    <div class="mb-8 sm:mb-10">
+                        <div class="flex items-center gap-2 sm:gap-3 mb-4 border-b border-gray-100 dark:border-gray-800 pb-2">
+                            <div class="p-1.5 sm:p-2 bg-brandBlack dark:bg-gray-800 text-gold-500 rounded-full shadow-sm"><svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div>
+                            <h3 class="text-xl sm:text-2xl font-black text-brandBlack dark:text-white">بيانات المقابلة الأساسية</h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 bg-gray-50 dark:bg-gray-800/40 p-4 sm:p-5 rounded-3xl border border-gray-100 dark:border-gray-800 transition-colors">
+                            <div>
+                                <label class="block text-gray-800 dark:text-gray-300 font-bold mb-2 text-sm sm:text-base">مسؤول المقابلة <span class="text-brandRed-500">*</span></label>
+                                <input type="text" name="entry.110769190" required placeholder="اسمك الكامل" class="input-field req-input w-full px-4 py-3 sm:py-3.5 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:border-brandRed-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-brandRed-900/30 text-gray-900 dark:text-white text-sm sm:text-base">
+                            </div>
+                            <div>
+                                <label class="block text-gray-800 dark:text-gray-300 font-bold mb-2 text-sm sm:text-base">تاريخ اليوم <span class="text-brandRed-500">*</span></label>
+                                <input type="date" name="entry.1448701971" required class="input-field req-input w-full px-4 py-3 sm:py-3.5 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:border-brandRed-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-brandRed-900/30 text-gray-900 dark:text-white text-sm sm:text-base">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ================= القسم 2: البيانات الشخصية ================= -->
+                    <div class="mb-8 sm:mb-10">
+                        <div class="flex items-center gap-2 sm:gap-3 mb-4 border-b border-gray-100 dark:border-gray-800 pb-2">
+                            <div class="p-1.5 sm:p-2 bg-brandRed-600 text-white rounded-full shadow-sm"><svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></div>
+                            <h3 class="text-xl sm:text-2xl font-black text-brandBlack dark:text-white">البيانات الشخصية للمتقدم</h3>
+                        </div>
+                        
+                        <div class="space-y-4 sm:space-y-5 bg-gray-50 dark:bg-gray-800/40 p-4 sm:p-5 rounded-3xl border border-gray-100 dark:border-gray-800 transition-colors">
+                            <div>
+                                <label class="block text-gray-800 dark:text-gray-300 font-bold mb-2 text-sm sm:text-base">الاسم كامل (كما في البطاقة) <span class="text-brandRed-500">*</span></label>
+                                <input type="text" name="entry.39794929" required placeholder="الاسم الرباعي" class="input-field req-input w-full px-4 py-3 sm:py-3.5 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:border-brandRed-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-brandRed-900/30 text-sm sm:text-base dark:text-white">
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                                <div>
+                                    <label class="block text-gray-800 dark:text-gray-300 font-bold mb-2 text-sm sm:text-base">المحافظة <span class="text-brandRed-500">*</span></label>
+                                    <select name="entry.1330297754" required class="input-field req-input w-full px-4 py-3 sm:py-3.5 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:border-brandRed-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-brandRed-900/30 cursor-pointer text-sm sm:text-base dark:text-white">
+                                        <option value="" disabled selected>اختر المحافظة...</option>
+                                        <option value="القاهرة">القاهرة</option><option value="الجيزة">الجيزة</option><option value="الإسكندرية">الإسكندرية</option>
+                                        <option value="الدقهلية">الدقهلية</option><option value="البحر الأحمر">البحر الأحمر</option><option value="البحيرة">البحيرة</option>
+                                        <option value="الفيوم">الفيوم</option><option value="الغربية">الغربية</option><option value="الإسماعيلية">الإسماعيلية</option>
+                                        <option value="المنوفية">المنوفية</option><option value="المنيا">المنيا</option><option value="القليوبية">القليوبية</option>
+                                        <option value="الوادي الجديد">الوادي الجديد</option><option value="الشرقية">الشرقية</option><option value="السويس">السويس</option>
+                                        <option value="أسوان">أسوان</option><option value="أسيوط">أسيوط</option><option value="بني سويف">بني سويف</option>
+                                        <option value="بورسعيد">بورسعيد</option><option value="دمياط">دمياط</option><option value="جنوب سيناء">جنوب سيناء</option>
+                                        <option value="كفر الشيخ">كفر الشيخ</option><option value="مطروح">مطروح</option><option value="الأقصر">الأقصر</option>
+                                        <option value="قنا">قنا</option><option value="شمال سيناء">شمال سيناء</option><option value="سوهاج">سوهاج</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-800 dark:text-gray-300 font-bold mb-2 text-sm sm:text-base">رقم الهاتف <span class="text-brandRed-500">*</span></label>
+                                    <input type="tel" name="entry.445579757" required dir="ltr" placeholder="01X XXXX XXXX" class="input-field req-input text-right w-full px-4 py-3 sm:py-3.5 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:border-brandRed-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-brandRed-900/30 text-sm sm:text-base dark:text-white">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 bg-red-50/50 dark:bg-red-900/10 p-4 sm:p-5 rounded-3xl border border-red-100 dark:border-red-900/30 mt-4 sm:mt-5 transition-colors">
+                            <div>
+                                <label class="block text-brandBlack dark:text-gray-200 font-bold mb-2 sm:mb-3 text-sm sm:text-base">اللجنة المراد الانضمام إليها <span class="text-brandRed-500">*</span></label>
+                                <select name="entry.602646401" required class="input-field req-input w-full px-4 py-3 sm:py-3.5 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:border-brandRed-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-brandRed-900/30 cursor-pointer shadow-sm text-sm sm:text-base dark:text-white">
+                                    <option value="" disabled selected>تحديد اللجنة...</option>
+                                    <option value="لجنة السياحة والثقافة">لجنة السياحة والثقافة</option>
+                                    <option value="لجنة الاستدامة والتحول الأخضر">لجنة الاستدامة والتحول الأخضر</option>
+                                    <option value="لجنة ذوي الهمم">لجنة ذوي الهمم</option>
+                                    <option value="لجنة التخطيط والمتابعة">لجنة التخطيط والمتابعة</option>
+                                    <option value="لجنة التأهيل والدعم النفسي">لجنة التأهيل والدعم النفسي</option>
+                                    <option value="لجنة التدريب والتطوير">لجنة التدريب والتطوير</option>
+                                    <option value="لجنة الموارد البشرية">لجنة الموارد البشرية</option>
+                                    <option value="لجنة العلاقات العامة والدولية">لجنة العلاقات العامة والدولية</option>
+                                    <option value="لجنة التنظيم والمراسم">لجنة التنظيم والمراسم</option>
+                                    <option value="المكتب الإعلامي">المكتب الإعلامي</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-brandBlack dark:text-gray-200 font-bold mb-2 sm:mb-3 text-sm sm:text-base">طريقة الحضور <span class="text-brandRed-500">*</span></label>
+                                <div class="flex gap-2 sm:gap-3">
+                                    <label class="flex-1 cursor-pointer">
+                                        <input type="radio" name="entry.1242400461" value="اونلاين" required class="peer sr-only req-input">
+                                        <div class="flex items-center justify-center gap-1.5 py-3 px-2 rounded-full border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:border-brandRed-600 dark:peer-checked:border-brandRed-500 peer-checked:bg-red-50 dark:peer-checked:bg-red-900/20 peer-checked:text-brandRed-600 shadow-sm text-sm sm:text-base">
+                                            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                            أونلاين
+                                        </div>
+                                    </label>
+                                    <label class="flex-1 cursor-pointer">
+                                        <input type="radio" name="entry.1242400461" value="اوفلاين" required class="peer sr-only req-input">
+                                        <div class="flex items-center justify-center gap-1.5 py-3 px-2 rounded-full border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:border-brandRed-600 dark:peer-checked:border-brandRed-500 peer-checked:bg-red-50 dark:peer-checked:bg-red-900/20 peer-checked:text-brandRed-600 shadow-sm text-sm sm:text-base">
+                                            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                                            أوفلاين
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ================= القسم 3: التقييم التفصيلي ================= -->
+                    <div class="mb-8 sm:mb-10">
+                        <div class="flex items-center gap-2 sm:gap-3 mb-4 border-b border-gray-100 dark:border-gray-800 pb-2">
+                            <div class="p-1.5 sm:p-2 bg-gold-500 text-brandBlack rounded-full shadow-sm"><svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg></div>
+                            <h3 class="text-xl sm:text-2xl font-black text-brandBlack dark:text-white">التقييم التفصيلي</h3>
+                        </div>
+                        
+                        <div class="space-y-5 sm:space-y-6 bg-white dark:bg-gray-800/40 p-4 sm:p-6 rounded-3xl border border-gray-100 dark:border-gray-800 transition-colors">
+                            
+                            <!-- المظهر -->
+                            <div class="flex flex-col lg:flex-row lg:items-center justify-between border-b border-gray-100 dark:border-gray-700/50 pb-4">
+                                <label class="text-sm sm:text-base font-bold text-gray-800 dark:text-gray-300 mb-2 lg:mb-0">المظهر <span class="text-brandRed-500">*</span></label>
+                                <div class="flex flex-wrap sm:flex-nowrap gap-1.5 lg:justify-end w-full lg:w-auto">
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[55px]"><input type="radio" name="entry.699681147" value="ضعيف" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-red-500 dark:peer-checked:bg-red-600 peer-checked:text-white peer-checked:border-red-500 dark:peer-checked:border-red-600 shadow-sm text-xs">ضعيف</div></label>
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[55px]"><input type="radio" name="entry.699681147" value="مقبول" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-orange-500 dark:peer-checked:bg-orange-600 peer-checked:text-white peer-checked:border-orange-500 dark:peer-checked:border-orange-600 shadow-sm text-xs">مقبول</div></label>
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[55px]"><input type="radio" name="entry.699681147" value="جيد" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-yellow-400 dark:peer-checked:bg-yellow-500 peer-checked:text-brandBlack peer-checked:border-yellow-400 dark:peer-checked:border-yellow-500 shadow-sm text-xs">جيد</div></label>
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[70px]"><input type="radio" name="entry.699681147" value="جيد جدا" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-lime-500 dark:peer-checked:bg-lime-600 peer-checked:text-white peer-checked:border-lime-500 dark:peer-checked:border-lime-600 shadow-sm text-xs whitespace-nowrap">جيد جدا</div></label>
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[55px]"><input type="radio" name="entry.699681147" value="ممتاز" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-green-500 dark:peer-checked:bg-green-600 peer-checked:text-white peer-checked:border-green-500 dark:peer-checked:border-green-600 shadow-sm text-xs">ممتاز</div></label>
+                                </div>
+                            </div>
+
+                            <!-- اللباقة -->
+                            <div class="flex flex-col lg:flex-row lg:items-center justify-between border-b border-gray-100 dark:border-gray-700/50 pb-4">
+                                <label class="text-sm sm:text-base font-bold text-gray-800 dark:text-gray-300 mb-2 lg:mb-0">اللباقة وطريقة التحدث <span class="text-brandRed-500">*</span></label>
+                                <div class="flex flex-wrap sm:flex-nowrap gap-1.5 lg:justify-end w-full lg:w-auto">
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[55px]"><input type="radio" name="entry.393000788" value="ضعيف" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-red-500 dark:peer-checked:bg-red-600 peer-checked:text-white peer-checked:border-red-500 dark:peer-checked:border-red-600 shadow-sm text-xs">ضعيف</div></label>
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[55px]"><input type="radio" name="entry.393000788" value="مقبول" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-orange-500 dark:peer-checked:bg-orange-600 peer-checked:text-white peer-checked:border-orange-500 dark:peer-checked:border-orange-600 shadow-sm text-xs">مقبول</div></label>
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[55px]"><input type="radio" name="entry.393000788" value="جيد" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-yellow-400 dark:peer-checked:bg-yellow-500 peer-checked:text-brandBlack peer-checked:border-yellow-400 dark:peer-checked:border-yellow-500 shadow-sm text-xs">جيد</div></label>
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[70px]"><input type="radio" name="entry.393000788" value="جيد جدا" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-lime-500 dark:peer-checked:bg-lime-600 peer-checked:text-white peer-checked:border-lime-500 dark:peer-checked:border-lime-600 shadow-sm text-xs whitespace-nowrap">جيد جدا</div></label>
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[55px]"><input type="radio" name="entry.393000788" value="ممتاز" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-green-500 dark:peer-checked:bg-green-600 peer-checked:text-white peer-checked:border-green-500 dark:peer-checked:border-green-600 shadow-sm text-xs">ممتاز</div></label>
+                                </div>
+                            </div>
+
+                            <!-- مهام اللجنة -->
+                            <div class="flex flex-col lg:flex-row lg:items-center justify-between border-b border-gray-100 dark:border-gray-700/50 pb-4">
+                                <label class="text-sm sm:text-base font-bold text-gray-800 dark:text-gray-300 mb-2 lg:mb-0">المعرفة بمهام اللجنة <span class="text-brandRed-500">*</span></label>
+                                <div class="flex flex-wrap sm:flex-nowrap gap-1.5 lg:justify-end w-full lg:w-auto">
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[55px]"><input type="radio" name="entry.2112193422" value="ضعيف" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-red-500 dark:peer-checked:bg-red-600 peer-checked:text-white peer-checked:border-red-500 dark:peer-checked:border-red-600 shadow-sm text-xs">ضعيف</div></label>
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[55px]"><input type="radio" name="entry.2112193422" value="مقبول" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-orange-500 dark:peer-checked:bg-orange-600 peer-checked:text-white peer-checked:border-orange-500 dark:peer-checked:border-orange-600 shadow-sm text-xs">مقبول</div></label>
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[55px]"><input type="radio" name="entry.2112193422" value="جيد" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-yellow-400 dark:peer-checked:bg-yellow-500 peer-checked:text-brandBlack peer-checked:border-yellow-400 dark:peer-checked:border-yellow-500 shadow-sm text-xs">جيد</div></label>
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[70px]"><input type="radio" name="entry.2112193422" value="جيد جدا" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-lime-500 dark:peer-checked:bg-lime-600 peer-checked:text-white peer-checked:border-lime-500 dark:peer-checked:border-lime-600 shadow-sm text-xs whitespace-nowrap">جيد جدا</div></label>
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[55px]"><input type="radio" name="entry.2112193422" value="ممتاز" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-green-500 dark:peer-checked:bg-green-600 peer-checked:text-white peer-checked:border-green-500 dark:peer-checked:border-green-600 shadow-sm text-xs">ممتاز</div></label>
+                                </div>
+                            </div>
+
+                            <!-- معرفة الاتحاد -->
+                            <div class="flex flex-col lg:flex-row lg:items-center justify-between border-b border-gray-100 dark:border-gray-700/50 pb-4">
+                                <label class="text-sm sm:text-base font-bold text-gray-800 dark:text-gray-300 mb-2 lg:mb-0">المعرفة بالاتحاد <span class="text-brandRed-500">*</span></label>
+                                <div class="flex flex-wrap sm:flex-nowrap gap-1.5 lg:justify-end w-full lg:w-auto">
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[55px]"><input type="radio" name="entry.43704687" value="ضعيف" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-red-500 dark:peer-checked:bg-red-600 peer-checked:text-white peer-checked:border-red-500 dark:peer-checked:border-red-600 shadow-sm text-xs">ضعيف</div></label>
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[55px]"><input type="radio" name="entry.43704687" value="مقبول" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-orange-500 dark:peer-checked:bg-orange-600 peer-checked:text-white peer-checked:border-orange-500 dark:peer-checked:border-orange-600 shadow-sm text-xs">مقبول</div></label>
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[55px]"><input type="radio" name="entry.43704687" value="جيد" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-yellow-400 dark:peer-checked:bg-yellow-500 peer-checked:text-brandBlack peer-checked:border-yellow-400 dark:peer-checked:border-yellow-500 shadow-sm text-xs">جيد</div></label>
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[70px]"><input type="radio" name="entry.43704687" value="جيد جدا" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-lime-500 dark:peer-checked:bg-lime-600 peer-checked:text-white peer-checked:border-lime-500 dark:peer-checked:border-lime-600 shadow-sm text-xs whitespace-nowrap">جيد جدا</div></label>
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[55px]"><input type="radio" name="entry.43704687" value="ممتاز" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-green-500 dark:peer-checked:bg-green-600 peer-checked:text-white peer-checked:border-green-500 dark:peer-checked:border-green-600 shadow-sm text-xs">ممتاز</div></label>
+                                </div>
+                            </div>
+
+                            <!-- الثقافة العامة -->
+                            <div class="flex flex-col lg:flex-row lg:items-center justify-between border-b border-gray-100 dark:border-gray-700/50 pb-4">
+                                <label class="text-sm sm:text-base font-bold text-gray-800 dark:text-gray-300 mb-2 lg:mb-0">الثقافة العامة <span class="text-brandRed-500">*</span></label>
+                                <div class="flex flex-wrap sm:flex-nowrap gap-1.5 lg:justify-end w-full lg:w-auto">
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[55px]"><input type="radio" name="entry.563600896" value="ضعيف" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-red-500 dark:peer-checked:bg-red-600 peer-checked:text-white peer-checked:border-red-500 dark:peer-checked:border-red-600 shadow-sm text-xs">ضعيف</div></label>
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[55px]"><input type="radio" name="entry.563600896" value="مقبول" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-orange-500 dark:peer-checked:bg-orange-600 peer-checked:text-white peer-checked:border-orange-500 dark:peer-checked:border-orange-600 shadow-sm text-xs">مقبول</div></label>
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[55px]"><input type="radio" name="entry.563600896" value="جيد" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-yellow-400 dark:peer-checked:bg-yellow-500 peer-checked:text-brandBlack peer-checked:border-yellow-400 dark:peer-checked:border-yellow-500 shadow-sm text-xs">جيد</div></label>
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[70px]"><input type="radio" name="entry.563600896" value="جيد جدا" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-lime-500 dark:peer-checked:bg-lime-600 peer-checked:text-white peer-checked:border-lime-500 dark:peer-checked:border-lime-600 shadow-sm text-xs whitespace-nowrap">جيد جدا</div></label>
+                                    <label class="cursor-pointer option-btn flex-1 min-w-[55px]"><input type="radio" name="entry.563600896" value="ممتاز" required class="peer sr-only req-input"><div class="text-center px-1 py-2 sm:py-2.5 rounded-full border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:bg-green-500 dark:peer-checked:bg-green-600 peer-checked:text-white peer-checked:border-green-500 dark:peer-checked:border-green-600 shadow-sm text-xs">ممتاز</div></label>
+                                </div>
+                            </div>
+
+                            <!-- برامج الأوفيس -->
+                            <div class="pt-2">
+                                <h4 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">مهارات الحاسب الآلي (Office)</h4>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
+                                    <!-- Excel -->
+                                    <div class="bg-white dark:bg-gray-800 p-3 sm:p-4 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                                        <div class="flex items-center gap-3 mb-3">
+                                            <!-- أيقونة في خلفية دائرية -->
+                                            <div class="w-8 h-8 rounded-full bg-green-50 dark:bg-green-900/30 flex items-center justify-center border border-green-100 dark:border-green-800">
+                                                <svg class="w-4 h-4 text-green-600 dark:text-green-500" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1.4 14.5l-1.6-2.4-1.6 2.4H7.6l2.4-3.5-2.4-3.5h1.8l1.6 2.4 1.6-2.4h1.8l-2.4 3.5 2.4 3.5h-1.8z"/></svg>
+                                            </div>
+                                            <span class="font-bold text-sm text-gray-800 dark:text-gray-200">Excel</span>
+                                        </div>
+                                        <div class="flex flex-row-reverse justify-between w-full gap-1">
+                                            <label class="cursor-pointer option-btn flex-1"><input type="radio" name="entry.1468811156" value="ضعيف" required class="peer sr-only req-input"><div class="flex items-center justify-center w-full text-[9px] sm:text-xs py-1.5 rounded-full border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:border-red-500 peer-checked:bg-red-500 dark:peer-checked:bg-red-600 peer-checked:text-white">ضعيف</div></label>
+                                            <label class="cursor-pointer option-btn flex-1"><input type="radio" name="entry.1468811156" value="مقبول" required class="peer sr-only req-input"><div class="flex items-center justify-center w-full text-[9px] sm:text-xs py-1.5 rounded-full border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:border-orange-500 peer-checked:bg-orange-500 dark:peer-checked:bg-orange-600 peer-checked:text-white">مقبول</div></label>
+                                            <label class="cursor-pointer option-btn flex-1"><input type="radio" name="entry.1468811156" value="جيد" required class="peer sr-only req-input"><div class="flex items-center justify-center w-full text-[9px] sm:text-xs py-1.5 rounded-full border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:border-yellow-400 peer-checked:bg-yellow-400 dark:peer-checked:bg-yellow-500 peer-checked:text-brandBlack">جيد</div></label>
+                                            <label class="cursor-pointer option-btn flex-1"><input type="radio" name="entry.1468811156" value="جيد جدا" required class="peer sr-only req-input"><div class="flex items-center justify-center w-full text-[9px] sm:text-xs py-1.5 rounded-full border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:border-lime-500 peer-checked:bg-lime-500 dark:peer-checked:bg-lime-600 peer-checked:text-white">جداً</div></label>
+                                            <label class="cursor-pointer option-btn flex-1"><input type="radio" name="entry.1468811156" value="ممتاز" required class="peer sr-only req-input"><div class="flex items-center justify-center w-full text-[9px] sm:text-xs py-1.5 rounded-full border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:border-green-500 peer-checked:bg-green-500 dark:peer-checked:bg-green-600 peer-checked:text-white">ممتاز</div></label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Word -->
+                                    <div class="bg-white dark:bg-gray-800 p-3 sm:p-4 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                                        <div class="flex items-center gap-3 mb-3">
+                                            <div class="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center border border-blue-100 dark:border-blue-800">
+                                                <svg class="w-4 h-4 text-blue-600 dark:text-blue-500" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm1.1 14.5h-1.7l-1.2-3.8-1.2 3.8H9.3l-1.8-5h1.7l1 3.5 1.1-3.5h1.4l1.1 3.5 1 3.5h1.7l-1.8 5z"/></svg>
+                                            </div>
+                                            <span class="font-bold text-sm text-gray-800 dark:text-gray-200">Word</span>
+                                        </div>
+                                        <div class="flex flex-row-reverse justify-between w-full gap-1">
+                                            <label class="cursor-pointer option-btn flex-1"><input type="radio" name="entry.149836277" value="ضعيف" required class="peer sr-only req-input"><div class="flex items-center justify-center w-full text-[9px] sm:text-xs py-1.5 rounded-full border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:border-red-500 peer-checked:bg-red-500 dark:peer-checked:bg-red-600 peer-checked:text-white">ضعيف</div></label>
+                                            <label class="cursor-pointer option-btn flex-1"><input type="radio" name="entry.149836277" value="مقبول" required class="peer sr-only req-input"><div class="flex items-center justify-center w-full text-[9px] sm:text-xs py-1.5 rounded-full border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:border-orange-500 peer-checked:bg-orange-500 dark:peer-checked:bg-orange-600 peer-checked:text-white">مقبول</div></label>
+                                            <label class="cursor-pointer option-btn flex-1"><input type="radio" name="entry.149836277" value="جيد" required class="peer sr-only req-input"><div class="flex items-center justify-center w-full text-[9px] sm:text-xs py-1.5 rounded-full border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:border-yellow-400 peer-checked:bg-yellow-400 dark:peer-checked:bg-yellow-500 peer-checked:text-brandBlack">جيد</div></label>
+                                            <label class="cursor-pointer option-btn flex-1"><input type="radio" name="entry.149836277" value="جيد جدا" required class="peer sr-only req-input"><div class="flex items-center justify-center w-full text-[9px] sm:text-xs py-1.5 rounded-full border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:border-lime-500 peer-checked:bg-lime-500 dark:peer-checked:bg-lime-600 peer-checked:text-white">جداً</div></label>
+                                            <label class="cursor-pointer option-btn flex-1"><input type="radio" name="entry.149836277" value="ممتاز" required class="peer sr-only req-input"><div class="flex items-center justify-center w-full text-[9px] sm:text-xs py-1.5 rounded-full border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:border-green-500 peer-checked:bg-green-500 dark:peer-checked:bg-green-600 peer-checked:text-white">ممتاز</div></label>
+                                        </div>
+                                    </div>
+
+                                    <!-- PowerPoint -->
+                                    <div class="bg-white dark:bg-gray-800 p-3 sm:p-4 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                                        <div class="flex items-center gap-3 mb-3">
+                                            <div class="w-8 h-8 rounded-full bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center border border-orange-100 dark:border-orange-800">
+                                                <svg class="w-4 h-4 text-orange-500 dark:text-orange-400" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1.5 8.5H10v5.5H8.5v-8h4c1.1 0 2 .9 2 2s-.9 2-2 2zm-1-1.5v1.5h1c.4 0 .8-.3.8-.8s-.4-.8-.8-.8h-1z"/></svg>
+                                            </div>
+                                            <span class="font-bold text-sm text-gray-800 dark:text-gray-200">PowerPoint</span>
+                                        </div>
+                                        <div class="flex flex-row-reverse justify-between w-full gap-1">
+                                            <label class="cursor-pointer option-btn flex-1"><input type="radio" name="entry.439792606" value="ضعيف" required class="peer sr-only req-input"><div class="flex items-center justify-center w-full text-[9px] sm:text-xs py-1.5 rounded-full border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:border-red-500 peer-checked:bg-red-500 dark:peer-checked:bg-red-600 peer-checked:text-white">ضعيف</div></label>
+                                            <label class="cursor-pointer option-btn flex-1"><input type="radio" name="entry.439792606" value="مقبول" required class="peer sr-only req-input"><div class="flex items-center justify-center w-full text-[9px] sm:text-xs py-1.5 rounded-full border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:border-orange-500 peer-checked:bg-orange-500 dark:peer-checked:bg-orange-600 peer-checked:text-white">مقبول</div></label>
+                                            <label class="cursor-pointer option-btn flex-1"><input type="radio" name="entry.439792606" value="جيد" required class="peer sr-only req-input"><div class="flex items-center justify-center w-full text-[9px] sm:text-xs py-1.5 rounded-full border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:border-yellow-400 peer-checked:bg-yellow-400 dark:peer-checked:bg-yellow-500 peer-checked:text-brandBlack">جيد</div></label>
+                                            <label class="cursor-pointer option-btn flex-1"><input type="radio" name="entry.439792606" value="جيد جدا" required class="peer sr-only req-input"><div class="flex items-center justify-center w-full text-[9px] sm:text-xs py-1.5 rounded-full border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:border-lime-500 peer-checked:bg-lime-500 dark:peer-checked:bg-lime-600 peer-checked:text-white">جداً</div></label>
+                                            <label class="cursor-pointer option-btn flex-1"><input type="radio" name="entry.439792606" value="ممتاز" required class="peer sr-only req-input"><div class="flex items-center justify-center w-full text-[9px] sm:text-xs py-1.5 rounded-full border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 font-bold transition-all peer-checked:border-green-500 peer-checked:bg-green-500 dark:peer-checked:bg-green-600 peer-checked:text-white">ممتاز</div></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- ================= القسم 4: المهارات والخبرات ================= -->
+                    <div class="mb-8 sm:mb-10">
+                        <div class="flex items-center gap-2 sm:gap-3 mb-4 border-b border-gray-100 dark:border-gray-800 pb-2">
+                            <div class="p-1.5 sm:p-2 bg-gray-100 dark:bg-gray-800 text-brandRed-600 rounded-full shadow-sm"><svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div>
+                            <h3 class="text-xl sm:text-2xl font-black text-brandBlack dark:text-white">المهارات والخبرات</h3>
+                        </div>
+                        <div class="space-y-4 sm:space-y-5 bg-gray-50 dark:bg-gray-800/40 p-4 sm:p-5 rounded-3xl border border-gray-100 dark:border-gray-800 transition-colors">
+                            <div>
+                                <label class="block text-gray-800 dark:text-gray-300 font-bold mb-2 text-sm sm:text-base">المهارات العامة <span class="text-brandRed-500">*</span></label>
+                                <textarea name="entry.463780534" rows="2" required placeholder="اذكر المهارات التي تتقنها..." class="input-field req-input w-full px-4 py-3 sm:py-3.5 rounded-3xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:border-brandRed-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-brandRed-900/30 resize-none text-sm sm:text-base dark:text-white"></textarea>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                                <div>
+                                    <label class="block text-gray-800 dark:text-gray-300 font-bold mb-2 text-sm sm:text-base">اللغات <span class="text-brandRed-500">*</span></label>
+                                    <input type="text" name="entry.575480984" required placeholder="مثال: الإنجليزية (جيد جداً)" class="input-field req-input w-full px-4 py-3 sm:py-3.5 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:border-brandRed-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-brandRed-900/30 text-sm sm:text-base dark:text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-800 dark:text-gray-300 font-bold mb-2 text-sm sm:text-base">الهوايات <span class="text-brandRed-500">*</span></label>
+                                    <input type="text" name="entry.32870955" required placeholder="مثال: القراءة، التصميم..." class="input-field req-input w-full px-4 py-3 sm:py-3.5 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:border-brandRed-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-brandRed-900/30 text-sm sm:text-base dark:text-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-gray-800 dark:text-gray-300 font-bold mb-2 text-sm sm:text-base">الخبرات (حالية / سابقة) <span class="text-brandRed-500">*</span></label>
+                                <textarea name="entry.791498292" rows="2" required placeholder="هل لديك تجارب سابقة؟ اذكرها هنا..." class="input-field req-input w-full px-4 py-3 sm:py-3.5 rounded-3xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:border-brandRed-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-brandRed-900/30 resize-none text-sm sm:text-base dark:text-white"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-gray-800 dark:text-gray-300 font-bold mb-2 text-sm sm:text-base">الهدف من الانضمام للاتحاد <span class="text-brandRed-500">*</span></label>
+                                <input type="text" name="entry.454249135" required placeholder="ما هو دافعك الأساسي للانضمام؟" class="input-field req-input w-full px-4 py-3 sm:py-3.5 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:border-brandRed-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-brandRed-900/30 text-sm sm:text-base dark:text-white">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ================= القسم 5: الملاحظات والتقييم النهائي ================= -->
+                    <div class="mb-6 sm:mb-10 relative overflow-hidden bg-white dark:bg-[#0f1115] p-4 sm:p-8 rounded-3xl border-2 border-gold-500 dark:border-gold-600 shadow-xl transition-colors">
+                        <div class="relative z-10">
+                            <h3 class="text-xl sm:text-2xl font-black text-brandBlack dark:text-gold-500 mb-4 sm:mb-6 border-b border-gray-200 dark:border-gray-800 pb-3">القرار النهائي</h3>
+                            
+                            <div class="mb-5 sm:mb-6">
+                                <label class="block text-gray-800 dark:text-gray-300 font-bold mb-2 sm:mb-3 text-sm sm:text-base">ملاحظات مسوؤل المقابلة (تطوع في مكان آخر) <span class="text-brandRed-500">*</span></label>
+                                <textarea name="entry.1200011215" rows="3" required placeholder="اكتب رأيك النهائي وملاحظاتك هنا..." class="input-field req-input w-full px-4 py-3 sm:py-3.5 rounded-3xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/30 placeholder-gray-400 dark:placeholder-gray-600 resize-none text-sm sm:text-base"></textarea>
+                            </div>
+
+                            <div class="bg-gray-50 dark:bg-gray-800/50 p-4 sm:p-6 rounded-3xl border border-gray-200 dark:border-gray-700">
+                                <label class="block text-brandBlack dark:text-white font-black mb-3 sm:mb-5 text-center text-sm sm:text-lg tracking-wide">التقييم النهائي ( من 1 إلى 10 ) <span class="text-brandRed-500">*</span></label>
+                                
+                                <div class="flex flex-wrap justify-center gap-1.5 sm:gap-2 dir-ltr" dir="ltr">
+                                    <label class="cursor-pointer option-btn w-full max-w-[18%] sm:max-w-none sm:flex-1">
+                                        <input type="radio" name="entry.853712356" value="1" required class="peer sr-only req-input">
+                                        <div class="h-10 sm:h-12 flex items-center justify-center rounded-full bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 font-black text-sm sm:text-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 peer-checked:bg-red-600 peer-checked:border-red-600 peer-checked:text-white shadow-sm">1</div>
+                                    </label>
+                                    <label class="cursor-pointer option-btn w-full max-w-[18%] sm:max-w-none sm:flex-1">
+                                        <input type="radio" name="entry.853712356" value="2" required class="peer sr-only req-input">
+                                        <div class="h-10 sm:h-12 flex items-center justify-center rounded-full bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 font-black text-sm sm:text-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 peer-checked:bg-red-500 peer-checked:border-red-500 peer-checked:text-white shadow-sm">2</div>
+                                    </label>
+                                    <label class="cursor-pointer option-btn w-full max-w-[18%] sm:max-w-none sm:flex-1">
+                                        <input type="radio" name="entry.853712356" value="3" required class="peer sr-only req-input">
+                                        <div class="h-10 sm:h-12 flex items-center justify-center rounded-full bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 font-black text-sm sm:text-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 peer-checked:bg-orange-500 peer-checked:border-orange-500 peer-checked:text-white shadow-sm">3</div>
+                                    </label>
+                                    <label class="cursor-pointer option-btn w-full max-w-[18%] sm:max-w-none sm:flex-1">
+                                        <input type="radio" name="entry.853712356" value="4" required class="peer sr-only req-input">
+                                        <div class="h-10 sm:h-12 flex items-center justify-center rounded-full bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 font-black text-sm sm:text-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 peer-checked:bg-orange-400 peer-checked:border-orange-400 peer-checked:text-brandBlack shadow-sm">4</div>
+                                    </label>
+                                    <label class="cursor-pointer option-btn w-full max-w-[18%] sm:max-w-none sm:flex-1">
+                                        <input type="radio" name="entry.853712356" value="5" required class="peer sr-only req-input">
+                                        <div class="h-10 sm:h-12 flex items-center justify-center rounded-full bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 font-black text-sm sm:text-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 peer-checked:bg-yellow-400 peer-checked:border-yellow-400 peer-checked:text-brandBlack shadow-sm">5</div>
+                                    </label>
+                                    <label class="cursor-pointer option-btn w-full max-w-[18%] sm:max-w-none sm:flex-1">
+                                        <input type="radio" name="entry.853712356" value="6" required class="peer sr-only req-input">
+                                        <div class="h-10 sm:h-12 flex items-center justify-center rounded-full bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 font-black text-sm sm:text-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 peer-checked:bg-yellow-500 peer-checked:border-yellow-500 peer-checked:text-brandBlack shadow-sm">6</div>
+                                    </label>
+                                    <label class="cursor-pointer option-btn w-full max-w-[18%] sm:max-w-none sm:flex-1">
+                                        <input type="radio" name="entry.853712356" value="7" required class="peer sr-only req-input">
+                                        <div class="h-10 sm:h-12 flex items-center justify-center rounded-full bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 font-black text-sm sm:text-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 peer-checked:bg-lime-400 peer-checked:border-lime-400 peer-checked:text-brandBlack shadow-sm">7</div>
+                                    </label>
+                                    <label class="cursor-pointer option-btn w-full max-w-[18%] sm:max-w-none sm:flex-1">
+                                        <input type="radio" name="entry.853712356" value="8" required class="peer sr-only req-input">
+                                        <div class="h-10 sm:h-12 flex items-center justify-center rounded-full bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 font-black text-sm sm:text-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 peer-checked:bg-lime-500 peer-checked:border-lime-500 peer-checked:text-white shadow-sm">8</div>
+                                    </label>
+                                    <label class="cursor-pointer option-btn w-full max-w-[18%] sm:max-w-none sm:flex-1">
+                                        <input type="radio" name="entry.853712356" value="9" required class="peer sr-only req-input">
+                                        <div class="h-10 sm:h-12 flex items-center justify-center rounded-full bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 font-black text-sm sm:text-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 peer-checked:bg-green-500 peer-checked:border-green-500 peer-checked:text-white shadow-sm">9</div>
+                                    </label>
+                                    <label class="cursor-pointer option-btn w-full max-w-[18%] sm:max-w-none sm:flex-1">
+                                        <input type="radio" name="entry.853712356" value="10" required class="peer sr-only req-input">
+                                        <div class="h-10 sm:h-12 flex items-center justify-center rounded-full bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 font-black text-sm sm:text-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 peer-checked:bg-green-600 peer-checked:border-green-600 peer-checked:text-white shadow-sm">10</div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- زر الإرسال -->
+                    <button type="submit" class="w-full flex justify-center py-3.5 sm:py-4 px-4 border border-transparent text-lg sm:text-xl font-black rounded-full text-white bg-brandRed-600 hover:bg-brandRed-700 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-red-500 shadow-lg transform transition-all duration-200 active:scale-[0.98]">
+                        <span class="flex items-center gap-2">
+                            حفظ التقييم وإرسال
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                        </span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- الفوتر -->
+    <footer class="bg-white dark:bg-[#0a0a0a] text-gray-800 dark:text-white py-6 sm:py-8 mt-10 border-t border-gray-200 dark:border-gray-800 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-gray-500 dark:text-gray-400 font-semibold text-xs sm:text-sm">© 2026 تم التطوير لصالح <span class="text-brandRed-600">اتحاد طلاب تحيا مصر</span></p>
+        </div>
+    </footer>
+
+    <!-- سكربت ميزات الموقع (شريط التقدم + الوضع الليلي) -->
+    <script>
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            if (document.documentElement.classList.contains('dark')) {
+                localStorage.theme = 'dark';
+            } else {
+                localStorage.theme = 'light';
+            }
+        }
+
+        function updateProgress() {
+            const form = document.getElementById('main-form');
+            const requiredInputs = Array.from(form.querySelectorAll('.req-input[required]'));
+            
+            const radioGroups = new Set();
+            let totalQuestions = 0;
+            let answeredQuestions = 0;
+
+            requiredInputs.forEach(input => {
+                if (input.type === 'radio') {
+                    radioGroups.add(input.name);
+                } else {
+                    totalQuestions++;
+                    if (input.value.trim() !== '') answeredQuestions++;
+                }
+            });
+
+            totalQuestions += radioGroups.size;
+
+            radioGroups.forEach(name => {
+                const checked = form.querySelector(`input[name="${name}"]:checked`);
+                if (checked) answeredQuestions++;
+            });
+
+            const percentage = totalQuestions === 0 ? 0 : Math.round((answeredQuestions / totalQuestions) * 100);
+            document.getElementById('progress-bar').style.width = percentage + '%';
+        }
+
+        document.getElementById('main-form').addEventListener('input', updateProgress);
+        document.getElementById('main-form').addEventListener('change', updateProgress);
+    </script>
+
+</body>
+</html>
