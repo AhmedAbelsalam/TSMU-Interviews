@@ -33,7 +33,8 @@
         } else {
             document.documentElement.classList.remove('dark');
         }
-        var submitted = false;
+        // ✅ ضع هنا رابط الـ Apps Script بعد النشر
+        var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHuJcsrBF1c1Ne-xTkYGm0jbeM_cRRGzs_JwqE1t1XtFrvoUVA9eOdk81jejTFi1aB/exec";
     </script>
     <style>
         html, body { 
@@ -50,7 +51,7 @@
             padding-bottom: 40px;
         }
 
-        .dark body {
+        html.dark body {
             background-color: #080808;
             background-image: radial-gradient(#27272a 1.5px, transparent 1.5px);
         }
@@ -200,9 +201,7 @@
 
             <!-- النموذج -->
             <div id="custom-form-container">
-                <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) { document.getElementById('custom-form-container').style.display='none'; document.getElementById('success-message').style.display='block'; window.scrollTo({top: document.getElementById('form-section').offsetTop - 50, behavior: 'smooth'}); }"></iframe>
-                
-                <form id="main-form" action="https://docs.google.com/forms/d/e/1FAIpQLSfR6EVq46d7mNiSicYhi0KP-WJFto9XUiv0OfvCB8b5Wegk4Q/formResponse?usp=header" method="POST" target="hidden_iframe" onsubmit="submitted=true;">
+                <form id="main-form" onsubmit="handleSubmit(event);" novalidate>
                     
                     <!-- ================= القسم 1: بيانات المقابلة ================= -->
                     <div class="mb-8">
@@ -450,7 +449,7 @@
                             <h3 class="text-xl sm:text-2xl font-black text-brandBlack dark:text-gold-500 mb-4 border-b border-gray-200 dark:border-gray-800 pb-3">القرار النهائي</h3>
                             
                             <div class="mb-5 min-w-0 w-full overflow-hidden">
-                                <label class="block text-gray-800 dark:text-gray-300 font-bold mb-2 text-sm sm:text-base">ملاحظات مسوؤل المقابلة (تطوع في مكان آخر) <span class="text-brandRed-500">*</span></label>
+                                <label class="block text-gray-800 dark:text-gray-300 font-bold mb-2 text-sm sm:text-base">ملاحظات مسؤول المقابلة (تطوع في مكان آخر) <span class="text-brandRed-500">*</span></label>
                                 <textarea name="entry.1200011215" rows="3" required placeholder="اكتب رأيك النهائي وملاحظاتك هنا..." class="input-field req-input px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/30 placeholder-gray-400 dark:placeholder-gray-600 resize-none text-sm sm:text-base"></textarea>
                             </div>
 
@@ -587,6 +586,90 @@
                 submitBtn.classList.remove('btn-ready');
                 submitText.innerHTML = 'حفظ التقييم وإرسال <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>';
                 isCompleted = false;
+            }
+        }
+
+        // ✅ دالة الإرسال الجديدة عبر Apps Script
+        async function handleSubmit(e) {
+            e.preventDefault();
+
+            const form = document.getElementById('main-form');
+            const submitBtn = document.getElementById('submit-btn');
+            const submitText = document.getElementById('submit-btn-text');
+
+            // التحقق من اكتمال الحقول المطلوبة
+            const requiredInputs = Array.from(form.querySelectorAll('.req-input[required]'));
+            let allValid = true;
+
+            // التحقق من الحقول النصية والـ select
+            requiredInputs.forEach(input => {
+                if (input.type !== 'radio' && input.value.trim() === '') {
+                    allValid = false;
+                    input.style.borderColor = '#E50914';
+                    input.addEventListener('input', () => { input.style.borderColor = ''; }, { once: true });
+                }
+            });
+
+            // التحقق من الـ radio groups
+            const radioGroups = new Set(
+                requiredInputs.filter(i => i.type === 'radio').map(i => i.name)
+            );
+            radioGroups.forEach(name => {
+                if (!form.querySelector(`input[name="${name}"]:checked`)) {
+                    allValid = false;
+                }
+            });
+
+            if (!allValid) {
+                alert('⚠️ يرجى ملء جميع الحقول المطلوبة قبل الإرسال.');
+                return;
+            }
+
+            // تجميع البيانات
+            const formData = {};
+            const allInputs = Array.from(form.querySelectorAll('[name]'));
+            allInputs.forEach(input => {
+                if (input.type === 'radio') {
+                    if (input.checked) formData[input.name] = input.value;
+                } else {
+                    formData[input.name] = input.value;
+                }
+            });
+
+            // تغيير حالة الزر أثناء الإرسال
+            submitBtn.disabled = true;
+            submitText.innerHTML = '<svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> جاري الإرسال...';
+
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(formData),
+                    headers: { 'Content-Type': 'text/plain' } // text/plain لتجنب CORS preflight
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    // إظهار رسالة النجاح
+                    document.getElementById('custom-form-container').style.display = 'none';
+                    document.getElementById('success-message').style.display = 'block';
+                    window.scrollTo({ top: document.getElementById('form-section').offsetTop - 50, behavior: 'smooth' });
+
+                    confetti({
+                        particleCount: 200,
+                        spread: 100,
+                        origin: { y: 0.5 },
+                        colors: ['#E50914', '#D4AF37', '#ffffff'],
+                        zIndex: 150
+                    });
+                } else {
+                    throw new Error(result.message || 'خطأ غير معروف');
+                }
+
+            } catch (err) {
+                submitBtn.disabled = false;
+                submitText.innerHTML = 'حفظ التقييم وإرسال <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>';
+                alert('❌ حدث خطأ أثناء الإرسال. يرجى التحقق من الاتصال والمحاولة مرة أخرى.\n\nالخطأ: ' + err.message);
             }
         }
 
